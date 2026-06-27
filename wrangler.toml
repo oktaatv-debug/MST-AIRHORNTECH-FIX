@@ -1,0 +1,7 @@
+name = "mon-airhorn"
+compatibility_date = "2025-08-01"
+pages_build_output_dir = "public"
+
+[[kv_namespaces]]
+binding = "MON_USERS"
+id = "f9f7a6515859443e9236fb68b6c8caaa"

@@ -1,0 +1,18 @@
+{
+  "MON-TEST-001": {
+    "pin": "123456",
+    "name": "Akun Demo",
+    "active": true,
+    "expired": "2099-12-31",
+    "maxDevice": 2,
+    "devices": {}
+  },
+  "MON-0001": {
+    "pin": "827391",
+    "name": "User 0001",
+    "active": true,
+    "expired": "2026-12-31",
+    "maxDevice": 2,
+    "devices": {}
+  }
+}

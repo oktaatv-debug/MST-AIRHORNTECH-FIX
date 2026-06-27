@@ -1,0 +1,22 @@
+MON AIRHORN CLOUDFLARE FIX TOTAL
+
+Upload semua isi folder ini ke GitHub.
+Pastikan root GitHub berisi:
+- public/
+- functions/
+- wrangler.toml
+- seed-users.json
+
+Cloudflare:
+- ADMIN_PASSWORD harus ada di Variables and secrets.
+- wrangler.toml sudah memakai KV ID f9f7a6515859443e9236fb68b6c8caaa.
+
+KV awal:
+Key: users
+Value: copy isi seed-users.json
+
+Login demo user:
+MON-TEST-001 / 123456
+
+Admin:
+https://modulonline12.pages.dev/admin.html
