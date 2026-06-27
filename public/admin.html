@@ -1,16 +1,315 @@
 <!DOCTYPE html>
-<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ADMIN MON AIRHORN</title>
-<style>*{box-sizing:border-box}body{font-family:Arial;background:#0d0d0d;color:#fff;margin:0;padding:18px}.container{max-width:1150px;margin:auto}.card{background:#171717;border:1px solid #333;border-radius:14px;padding:16px;margin-bottom:16px}h1{text-align:center;color:#f6b21a}input,button,select{width:100%;padding:12px;margin:7px 0;border-radius:9px;font-size:14px}input,select{background:#090909;color:white;border:1px solid #444}button{background:#f6b21a;border:0;font-weight:bold}.blue{background:#1e88e5;color:white}.red{background:#e53935;color:white}.gray{background:#333;color:white}.green{background:#28a745;color:white}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.status{background:#101010;border:1px solid #333;border-radius:10px;padding:12px;color:#9eff9e;white-space:pre-line;overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}td,th{border:1px solid #333;padding:8px;text-align:left}th{background:#222}@media(max-width:780px){.row3{grid-template-columns:1fr}}</style></head>
-<body><div class="container"><h1>ADMIN MON AIRHORN</h1><div class="card" id="loginCard"><h3>Login Admin</h3><input id="adminPass" type="password" placeholder="Password admin"><button class="blue" onclick="adminLogin()">MASUK ADMIN</button><div id="loginMsg" class="status">Masukkan ADMIN_PASSWORD dari Cloudflare.</div></div>
-<div id="adminApp" style="display:none"><div class="card"><h3>Tambah User</h3><div class="row3"><input id="no" type="number" value="2"><input id="code" placeholder="MON-0002" style="text-transform:uppercase"><input id="pin" placeholder="auto jika kosong"></div><div class="row3"><input id="name" placeholder="User 0002"><input id="expired" type="date"><input id="maxDevice" type="number" value="2" min="1"></div><div class="row3"><button class="blue" onclick="generate()">GENERATE</button><button class="green" onclick="saveUser()">SIMPAN USER</button><button class="gray" onclick="loadUsers()">REFRESH</button></div><div id="addMsg" class="status">Belum ada aksi.</div></div><div class="card"><h3>Daftar User</h3><input id="search" placeholder="Cari kode/nama..." oninput="renderUsers()"><div style="overflow:auto"><table><thead><tr><th>Kode</th><th>PIN</th><th>Nama</th><th>Expired</th><th>Device</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tbody"><tr><td colspan="7">Belum dimuat.</td></tr></tbody></table></div></div></div></div>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ADMIN MON AIRHORN</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial;background:#0d0d0d;color:#fff;margin:0;padding:18px}
+.container{max-width:1150px;margin:auto}
+.card{background:#171717;border:1px solid #333;border-radius:14px;padding:16px;margin-bottom:16px}
+h1{text-align:center;color:#f6b21a}
+input,button,select{width:100%;padding:12px;margin:7px 0;border-radius:9px;font-size:14px}
+input,select{background:#090909;color:white;border:1px solid #444}
+button{background:#f6b21a;border:0;font-weight:bold;cursor:pointer}
+.blue{background:#1e88e5;color:white}
+.red{background:#e53935;color:white}
+.gray{background:#333;color:white}
+.green{background:#28a745;color:white}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.status{background:#101010;border:1px solid #333;border-radius:10px;padding:12px;color:#9eff9e;white-space:pre-line;overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{border:1px solid #333;padding:8px;text-align:left}
+th{background:#222}
+@media(max-width:780px){.row3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>ADMIN MON AIRHORN</h1>
+
+<div class="card" id="loginCard">
+  <h3>Login Admin</h3>
+  <input id="adminPass" type="password" placeholder="Password admin">
+  <button class="blue" type="button" onclick="adminLogin()">MASUK ADMIN</button>
+  <div id="loginMsg" class="status">Masukkan ADMIN_PASSWORD dari Cloudflare.</div>
+</div>
+
+<div id="adminApp" style="display:none">
+
+<div class="card">
+  <h3>Tambah User</h3>
+
+  <div class="row3">
+    <input id="no" type="number" value="2" placeholder="Nomor">
+    <input id="code" placeholder="MON-0002" style="text-transform:uppercase">
+    <input id="pin" placeholder="auto jika kosong">
+  </div>
+
+  <div class="row3">
+    <input id="name" placeholder="User 0002">
+    <input id="expired" type="date">
+    <input id="maxDevice" type="number" value="2" min="1">
+  </div>
+
+  <div class="row3">
+    <button class="blue" type="button" onclick="generate()">GENERATE</button>
+    <button class="green" type="button" onclick="saveUser()">SIMPAN USER</button>
+    <button class="gray" type="button" onclick="loadUsers()">REFRESH</button>
+  </div>
+
+  <div id="addMsg" class="status">Belum ada aksi.</div>
+</div>
+
+<div class="card">
+  <h3>Daftar User</h3>
+  <input id="search" placeholder="Cari kode/nama..." oninput="renderUsers()">
+
+  <div style="overflow:auto">
+    <table>
+      <thead>
+        <tr>
+          <th>Kode</th>
+          <th>PIN</th>
+          <th>Nama</th>
+          <th>Expired</th>
+          <th>Device</th>
+          <th>Status</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td colspan="7">Belum dimuat.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+</div>
+
 <script>
-let ADMIN_TOKEN="",USERS={};function pad(n){return String(n).padStart(4,"0")}function randPin(){return String(Math.floor(100000+Math.random()*900000))}function todayPlus(d){let x=new Date();x.setDate(x.getDate()+d);return x.toISOString().slice(0,10)}function clean(v){return(v||"").trim().toUpperCase()}
-async function api(p,o={}){let r=await fetch(p,{...o,headers:{"Content-Type":"application/json","X-Admin-Token":ADMIN_TOKEN,...(o.headers||{})}}),d=await r.json();if(!d.ok)throw new Error(d.message||"API error");return d}
-async function adminLogin(){try{let d=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:adminPass.value})}).then(r=>r.json());if(!d.ok){loginMsg.innerText=d.message||"Login gagal";return}ADMIN_TOKEN=d.token;sessionStorage.setItem("admin_token",ADMIN_TOKEN);loginCard.style.display="none";adminApp.style.display="block";loadUsers()}catch(e){loginMsg.innerText=e.message}}
-function generate(){let n=Number(no.value||1);if(!code.value)code.value="MON-"+pad(n);if(!pin.value)pin.value=randPin();if(!name.value)name.value="User "+pad(n);if(!expired.value)expired.value=todayPlus(365)}
-async function saveUser(){generate();let u={code:clean(code.value),pin:pin.value.trim(),name:name.value.trim(),expired:expired.value,maxDevice:Number(maxDevice.value||2),active:true};try{await api("/api/admin/users",{method:"POST",body:JSON.stringify(u)});addMsg.innerText="User disimpan:\nKode: "+u.code+"\nPIN: "+u.pin+"\nExpired: "+u.expired;no.value=Number(no.value||1)+1;code.value=pin.value=name.value="";loadUsers()}catch(e){addMsg.innerText="Gagal: "+e.message}}
-async function loadUsers(){try{let d=await api("/api/admin/users");USERS=d.users||{};renderUsers()}catch(e){tbody.innerHTML='<tr><td colspan="7">Gagal load: '+e.message+'</td></tr>'}}
-function renderUsers(){let q=(search.value||"").toLowerCase(),keys=Object.keys(USERS).sort().filter(k=>k.toLowerCase().includes(q)||String((USERS[k]||{}).name||"").toLowerCase().includes(q));if(!keys.length){tbody.innerHTML='<tr><td colspan="7">Tidak ada user.</td></tr>';return}tbody.innerHTML="";keys.forEach(k=>{let u=USERS[k]||{},dev=Object.keys(u.devices||{}).length,tr=document.createElement("tr");tr.innerHTML=`<td><b>${k}</b></td><td>${u.pin||""}</td><td>${u.name||""}</td><td>${u.expired||""}</td><td>${dev}/${u.maxDevice||2}</td><td>${u.active===false?"BLOKIR":"AKTIF"}</td><td><button class="gray" onclick="copyUser('${k}')">COPY</button><button onclick="toggleUser('${k}')">${u.active===false?"AKTIFKAN":"BLOKIR"}</button><button class="blue" onclick="resetDevice('${k}')">RESET HP</button><button class="red" onclick="deleteUser('${k}')">HAPUS</button></td>`;tbody.appendChild(tr)})}
-async function toggleUser(k){await api("/api/admin/users",{method:"PATCH",body:JSON.stringify({code:k,active:USERS[k].active===false})});loadUsers()}async function resetDevice(k){await api("/api/admin/users",{method:"PATCH",body:JSON.stringify({code:k,devices:{}})});loadUsers()}async function deleteUser(k){if(!confirm("Hapus "+k+"?"))return;await api("/api/admin/users?code="+encodeURIComponent(k),{method:"DELETE"});loadUsers()}function copyUser(k){let u=USERS[k]||{},t=`Kode akses: ${k}\nPIN: ${u.pin||""}\nExpired: ${u.expired||""}`;navigator.clipboard.writeText(t);alert("Data dicopy:\n\n"+t)}
-ADMIN_TOKEN=sessionStorage.getItem("admin_token")||"";if(ADMIN_TOKEN){loginCard.style.display="none";adminApp.style.display="block";loadUsers()}
-</script></body></html>
+let ADMIN_TOKEN = "";
+let USERS = {};
+
+function el(id){ return document.getElementById(id); }
+function pad(n){ return String(n).padStart(4,"0"); }
+function randPin(){ return String(Math.floor(100000 + Math.random() * 900000)); }
+function clean(v){ return (v || "").trim().toUpperCase(); }
+
+function todayPlus(days){
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0,10);
+}
+
+async function api(path, opt = {}){
+  const res = await fetch(path, {
+    ...opt,
+    headers: {
+      "Content-Type": "application/json",
+      "X-Admin-Token": ADMIN_TOKEN,
+      ...(opt.headers || {})
+    }
+  });
+
+  const data = await res.json();
+  if(!data.ok) throw new Error(data.message || "API error");
+  return data;
+}
+
+async function adminLogin(){
+  try{
+    const d = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ password: el("adminPass").value })
+    }).then(r => r.json());
+
+    if(!d.ok){
+      el("loginMsg").innerText = d.message || "Login gagal";
+      return;
+    }
+
+    ADMIN_TOKEN = d.token;
+    sessionStorage.setItem("admin_token", ADMIN_TOKEN);
+
+    el("loginCard").style.display = "none";
+    el("adminApp").style.display = "block";
+
+    loadUsers();
+  }catch(e){
+    el("loginMsg").innerText = e.message;
+  }
+}
+
+function generate(){
+  const n = Number(el("no").value || 1);
+
+  if(!el("code").value) el("code").value = "MON-" + pad(n);
+  if(!el("pin").value) el("pin").value = randPin();
+  if(!el("name").value) el("name").value = "User " + pad(n);
+  if(!el("expired").value) el("expired").value = todayPlus(365);
+
+  el("addMsg").innerText =
+    "Kode siap dibuat:\\n" +
+    "Kode: " + el("code").value + "\\n" +
+    "PIN: " + el("pin").value + "\\n" +
+    "Expired: " + el("expired").value;
+}
+
+async function saveUser(){
+  try{
+    generate();
+
+    const u = {
+      code: clean(el("code").value),
+      pin: el("pin").value.trim(),
+      name: el("name").value.trim(),
+      expired: el("expired").value,
+      maxDevice: Number(el("maxDevice").value || 2),
+      active: true
+    };
+
+    if(!u.code){
+      el("addMsg").innerText = "Kode user belum diisi.";
+      return;
+    }
+
+    if(!u.pin){
+      el("addMsg").innerText = "PIN belum diisi.";
+      return;
+    }
+
+    el("addMsg").innerText = "Menyimpan user...";
+
+    await api("/api/admin/users", {
+      method: "POST",
+      body: JSON.stringify(u)
+    });
+
+    el("addMsg").innerText =
+      "User berhasil disimpan:\\n" +
+      "Kode: " + u.code + "\\n" +
+      "PIN: " + u.pin + "\\n" +
+      "Expired: " + u.expired;
+
+    el("no").value = Number(el("no").value || 1) + 1;
+    el("code").value = "";
+    el("pin").value = "";
+    el("name").value = "";
+
+    await loadUsers();
+  }catch(e){
+    el("addMsg").innerText = "Gagal simpan: " + e.message;
+  }
+}
+
+async function loadUsers(){
+  try{
+    const d = await api("/api/admin/users");
+    USERS = d.users || {};
+    renderUsers();
+  }catch(e){
+    el("tbody").innerHTML =
+      '<tr><td colspan="7">Gagal load: ' + e.message + '</td></tr>';
+  }
+}
+
+function renderUsers(){
+  const q = (el("search").value || "").toLowerCase();
+
+  const keys = Object.keys(USERS).sort().filter(k =>
+    k.toLowerCase().includes(q) ||
+    String((USERS[k] || {}).name || "").toLowerCase().includes(q)
+  );
+
+  if(!keys.length){
+    el("tbody").innerHTML = '<tr><td colspan="7">Tidak ada user.</td></tr>';
+    return;
+  }
+
+  el("tbody").innerHTML = "";
+
+  keys.forEach(k => {
+    const u = USERS[k] || {};
+    const dev = Object.keys(u.devices || {}).length;
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td><b>${k}</b></td>
+      <td>${u.pin || ""}</td>
+      <td>${u.name || ""}</td>
+      <td>${u.expired || ""}</td>
+      <td>${dev}/${u.maxDevice || 2}</td>
+      <td>${u.active === false ? "BLOKIR" : "AKTIF"}</td>
+      <td>
+        <button class="gray" type="button" onclick="copyUser('${k}')">COPY</button>
+        <button type="button" onclick="toggleUser('${k}')">${u.active === false ? "AKTIFKAN" : "BLOKIR"}</button>
+        <button class="blue" type="button" onclick="resetDevice('${k}')">RESET HP</button>
+        <button class="red" type="button" onclick="deleteUser('${k}')">HAPUS</button>
+      </td>
+    `;
+
+    el("tbody").appendChild(tr);
+  });
+}
+
+async function toggleUser(k){
+  await api("/api/admin/users", {
+    method: "PATCH",
+    body: JSON.stringify({
+      code: k,
+      active: USERS[k].active === false
+    })
+  });
+
+  loadUsers();
+}
+
+async function resetDevice(k){
+  await api("/api/admin/users", {
+    method: "PATCH",
+    body: JSON.stringify({
+      code: k,
+      devices: {}
+    })
+  });
+
+  loadUsers();
+}
+
+async function deleteUser(k){
+  if(!confirm("Hapus " + k + "?")) return;
+
+  await api("/api/admin/users?code=" + encodeURIComponent(k), {
+    method: "DELETE"
+  });
+
+  loadUsers();
+}
+
+function copyUser(k){
+  const u = USERS[k] || {};
+  const t =
+    "Kode akses: " + k + "\\n" +
+    "PIN: " + (u.pin || "") + "\\n" +
+    "Expired: " + (u.expired || "");
+
+  navigator.clipboard.writeText(t);
+  alert("Data dicopy:\\n\\n" + t);
+}
+
+ADMIN_TOKEN = sessionStorage.getItem("admin_token") || "";
+
+if(ADMIN_TOKEN){
+  el("loginCard").style.display = "none";
+  el("adminApp").style.display = "block";
+  loadUsers();
+}
+</script>
+
+</body>
+</html>
